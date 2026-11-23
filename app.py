@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 from PIL import Image
 import pypdf
 
@@ -17,40 +17,10 @@ st.warning(
     "Yeh koi legal, tax, ya Chartered Accountant (CA) ki official salah nahi hai. Final filing ya tax decision se pehle apne CA ya tax advisor se confirm karein."
 )
 
-
-def get_gemini_model(api_key_val: str):
-    genai.configure(api_key=api_key_val)
-    preferred_models = [
-        "models/gemini-2.5-flash",
-        "models/gemini-2.5-pro",
-        "gemini-2.5-flash",
-        "gemini-2.5-pro",
-    ]
-    available_names = []
-    try:
-        for m in genai.list_models():
-            methods = getattr(m, "supported_generation_methods", []) or []
-            if "generateContent" in methods:
-                available_names.append(m.name)
-    except Exception:
-        pass
-
-    for candidate in preferred_models:
-        if not available_names or candidate in available_names or f"models/{candidate}" in available_names:
-            return genai.GenerativeModel(candidate)
-
-    if available_names:
-        gemini_models = [n for n in available_names if "gemini" in n.lower()]
-        chosen = gemini_models[0] if gemini_models else available_names[0]
-        return genai.GenerativeModel(chosen)
-
-    return genai.GenerativeModel("gemini-2.5-flash")
-
-
 api_key = st.text_input("Apni Gemini API Key enter karein:", type="password")
 
 if api_key:
-    model = get_gemini_model(api_key.strip())
+    client = genai.Client(api_key=api_key.strip())
 
     vendor_type = st.selectbox(
         "Vendor / Enterprise Category chunein:",
@@ -104,13 +74,20 @@ if api_key:
                 4. **Next Steps**: Give 2-3 practical action points for the small business owner.
                 """
 
-                if uploaded_file and not isinstance(file_content, str):
-                    response = model.generate_content([prompt, file_content])
-                else:
-                    response = model.generate_content(prompt)
+                contents = [prompt, file_content] if (uploaded_file and not isinstance(file_content, str)) else prompt
+
+                try:
+                    response = client.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=contents
+                    )
+                    report_text = response.text
+                except Exception as e:
+                    st.error(f"Audit generate karte waqt error aaya: {e}")
+                    st.stop()
 
                 st.subheader("📊 Basic Audit Report")
-                st.markdown(response.text)
+                st.markdown(report_text)
 
                 st.divider()
                 st.info("💎 **Aage ke liye Pro Idea:** Bulk invoice check, detailed checklist export, aur vendor summary reports isme aage add kiye ja sakte hain.")
