@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from google import genai
 from PIL import Image
@@ -60,7 +61,7 @@ if api_key:
         final_data = input_text.strip() if input_mode == "Text / GSTIN paste karein" else file_content
 
         if final_data:
-            with st.spinner("Compliance details check ki ja rahi hain..."):
+            with st.spinner("Compliance details check ki ja rahi hain (load zyada ho toh auto-retry hoga)..."):
                 prompt = f"""
                 You are an Indian GST and MSME Compliance Assistant for local vendors and small businesses.
                 Analyze the following details for a {vendor_type}:
@@ -76,14 +77,32 @@ if api_key:
 
                 contents = [prompt, file_content] if (uploaded_file and not isinstance(file_content, str)) else prompt
 
-                try:
-                    response = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=contents
-                    )
-                    report_text = response.text
-                except Exception as e:
-                    st.error(f"Audit generate karte waqt error aaya: {e}")
+                report_text = None
+                last_error = None
+                models_to_try = ["gemini-3.8-flash", "gemini-3.8-pro"]
+
+                for model_name in models_to_try:
+                    for attempt in range(3):
+                        try:
+                            response = client.models.generate_content(
+                                model=model_name,
+                                contents=contents
+                            )
+                            if response and response.text:
+                                report_text = response.text
+                                break
+                        except Exception as e:
+                            last_error = e
+                            err_str = str(e)
+                            if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                                time.sleep(2 * (attempt + 1))
+                                continue
+                            break
+                    if report_text:
+                        break
+
+                if report_text is None:
+                    st.error(f"Audit generate karte waqt error aaya: {last_error}")
                     st.stop()
 
                 st.subheader("📊 Basic Audit Report")
