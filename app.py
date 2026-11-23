@@ -21,7 +21,7 @@ api_key = st.text_input("Apni Gemini API Key enter karein:", type="password")
 
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-2.5-pro")
 
     vendor_type = st.selectbox(
         "Vendor / Enterprise Category chunein:",
