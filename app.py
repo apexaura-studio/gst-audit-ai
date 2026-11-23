@@ -78,7 +78,7 @@ if api_key:
 
                 try:
                     response = client.models.generate_content(
-                        model="gemini-2.5-flash",
+                        model="gemini-3.8-flash",
                         contents=contents
                     )
                     report_text = response.text
@@ -95,3 +95,4 @@ if api_key:
             st.warning("Kripya audit ke liye text enter karein ya file upload karein.")
 else:
     st.info("💡 Aage badhne ke liye upar apni Gemini API key daalein.")
+    
