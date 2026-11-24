@@ -108,7 +108,7 @@ if api_key:
                 models_to_try = ["gemini-3.8-flash"]
 
                 for model_name in models_to_try:
-                    for attempt in range(4):
+                    for attempt in range(3):
                         try:
                             response = client.models.generate_content(
                                 model=model_name,
@@ -128,7 +128,19 @@ if api_key:
                         break
 
                 if report_text is None:
-                    st.error(f"Audit generate karte waqt error aaya: {last_error}")
+                    err_msg = str(last_error) if last_error else ""
+                    if "503" in err_msg or "UNAVAILABLE" in err_msg:
+                        st.warning(
+                            "⏳ Abhi model par temporary high demand hai. Kripya 15–20 seconds ruk kar "
+                            "**Run Free Basic Audit** par dubara click karein."
+                        )
+                    elif "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
+                        st.warning(
+                            "⚠️ Is API key / project ki request limit abhi reach ho chuki hai. "
+                            "Kripya thodi der baad try karein ya doosri API key daal kar check karein."
+                        )
+                    else:
+                        st.error("❌ Audit generate nahi ho paya. Kripya apni API key aur input check karke dubara try karein.")
                     st.stop()
 
                 st.subheader("📊 Basic Audit Report")
