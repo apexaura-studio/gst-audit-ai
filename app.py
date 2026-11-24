@@ -70,18 +70,20 @@ if api_key:
 
         if final_data:
             if report_lang == "English":
+                spinner_text = "Checking compliance details..."
                 lang_instruction = (
                     "Write the entire report in clear, professional, easy-to-understand English "
                     "suitable for Indian small business owners."
                 )
             else:
+                spinner_text = "अनुपालन विवरण की जाँच की जा रही है..."
                 lang_instruction = (
                     "Write the entire report in clear, simple Hindi (Devanagari script), "
                     "while keeping standard GST, tax, and MSME abbreviations/terms like GSTIN, HSN/SAC, "
                     "CGST, SGST, IGST, Invoice, Udyam, MSMED Act, Section 43B(h), and Input Tax Credit clear and readable."
                 )
 
-            with st.spinner("Compliance details check ki ja rahi hain..."):
+            with st.spinner(spinner_text):
                 prompt = f"""
                 You are an Indian GST and MSME Compliance Assistant for local vendors and small businesses.
                 Analyze the following details for a {vendor_type}:
