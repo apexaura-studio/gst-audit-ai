@@ -36,9 +36,8 @@ if api_key:
     report_lang = st.selectbox(
         "Report Language chunein:",
         [
-            "Hinglish",
-            "English",
-            "Hindi"
+            "Hindi",
+            "English"
         ]
     )
 
@@ -75,22 +74,14 @@ if api_key:
                     "Write the entire report in clear, professional, easy-to-understand English "
                     "suitable for Indian small business owners."
                 )
-            elif report_lang == "Hindi":
+            else:
                 lang_instruction = (
                     "Write the entire report in clear, simple Hindi (Devanagari script), "
                     "while keeping standard GST, tax, and MSME abbreviations/terms like GSTIN, HSN/SAC, "
                     "CGST, SGST, IGST, Invoice, Udyam, MSMED Act, Section 43B(h), and Input Tax Credit clear and readable."
                 )
-            else:
-                lang_instruction = (
-                    "Write the entire report in clean, natural Hinglish using Roman script (Latin alphabet), "
-                    "keeping standard GST, tax, and MSME technical terms in clear English "
-                    "(such as GSTIN, HSN/SAC, CGST, SGST, IGST, Taxable Value, Invoice No, Invoice Date, "
-                    "Input Tax Credit, GSTR-1, GSTR-2B, Udyam, MSMED Act, Section 43B(h), E-way Bill). "
-                    "Avoid Devanagari script."
-                )
 
-            with st.spinner("Compliance details check ki ja rahi hain (load zyada ho toh auto-retry hoga)..."):
+            with st.spinner("Compliance details check ki ja rahi hain..."):
                 prompt = f"""
                 You are an Indian GST and MSME Compliance Assistant for local vendors and small businesses.
                 Analyze the following details for a {vendor_type}:
@@ -127,7 +118,7 @@ if api_key:
                         except Exception as e:
                             last_error = e
                             err_str = str(e)
-                            if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                            if "503" in err_str or "UNAVAILABLE" in err_str:
                                 time.sleep(2 * (attempt + 1))
                                 continue
                             break
