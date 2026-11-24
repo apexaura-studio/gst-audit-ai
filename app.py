@@ -68,11 +68,17 @@ if api_key:
 
                 Data: {final_data}
 
-                Provide a clear, easy-to-understand basic audit report in simple Hindi/Hinglish with English technical terms where needed:
-                1. **GSTIN Format & Structure Check**: Check if a GSTIN is present and whether its structure looks valid (15-character format). Note that live government portal status requires official verification.
-                2. **Invoice Basics Check**: Look for key details like invoice number, date, HSN/SAC, and tax breakup (CGST/SGST/IGST), and point out anything missing or unclear.
-                3. **MSME & Payment Awareness**: Briefly highlight relevant MSME compliance points (such as Udyam details or timely payment awareness) based on the provided info.
-                4. **Next Steps**: Give 2-3 practical action points for the small business owner.
+                Language & Style Rules:
+                - Write the entire report in clean, natural Hinglish using Roman script (Latin alphabet), matching the app UI style.
+                - Keep standard GST, tax, and MSME technical terms in clear English (for example: GSTIN, HSN/SAC, CGST, SGST, IGST, Taxable Value, Invoice No, Invoice Date, Input Tax Credit, GSTR-1, GSTR-2B, Udyam, MSMED Act, Section 43B(h), E-way Bill).
+                - Avoid Devanagari script so the tone stays consistent throughout.
+                - Keep formatting crisp, structured, and easy to read on a mobile screen.
+
+                Structure the report into these 4 sections:
+                1. **GSTIN Format & Structure Check**: Check if a GSTIN is present and whether its 15-character structure looks valid (state code, PAN format, entity/check structure). Clearly note that live active/inactive status requires official GST portal verification.
+                2. **Invoice Basics Check**: Check key details like Invoice No, Invoice Date, HSN/SAC code, Place of Supply, and tax breakup (CGST/SGST/IGST) along with basic calculation accuracy, highlighting anything missing or unclear.
+                3. **MSME & Payment Awareness**: Highlight relevant MSME compliance points (such as Udyam registration details and timely payment rules / 45-day awareness where applicable) based on the provided info.
+                4. **Next Steps**: Give 3 practical, actionable steps for the small business owner.
                 """
 
                 contents = [prompt, file_content] if (uploaded_file and not isinstance(file_content, str)) else prompt
