@@ -33,6 +33,15 @@ if api_key:
         ]
     )
 
+    report_lang = st.selectbox(
+        "Report Language chunein:",
+        [
+            "Hinglish",
+            "English",
+            "Hindi"
+        ]
+    )
+
     input_mode = st.radio(
         "Data kaise dena chahte hain?",
         ["Text / GSTIN paste karein", "Invoice File (PDF/Image) upload karein"]
@@ -61,6 +70,26 @@ if api_key:
         final_data = input_text.strip() if input_mode == "Text / GSTIN paste karein" else file_content
 
         if final_data:
+            if report_lang == "English":
+                lang_instruction = (
+                    "Write the entire report in clear, professional, easy-to-understand English "
+                    "suitable for Indian small business owners."
+                )
+            elif report_lang == "Hindi":
+                lang_instruction = (
+                    "Write the entire report in clear, simple Hindi (Devanagari script), "
+                    "while keeping standard GST, tax, and MSME abbreviations/terms like GSTIN, HSN/SAC, "
+                    "CGST, SGST, IGST, Invoice, Udyam, MSMED Act, Section 43B(h), and Input Tax Credit clear and readable."
+                )
+            else:
+                lang_instruction = (
+                    "Write the entire report in clean, natural Hinglish using Roman script (Latin alphabet), "
+                    "keeping standard GST, tax, and MSME technical terms in clear English "
+                    "(such as GSTIN, HSN/SAC, CGST, SGST, IGST, Taxable Value, Invoice No, Invoice Date, "
+                    "Input Tax Credit, GSTR-1, GSTR-2B, Udyam, MSMED Act, Section 43B(h), E-way Bill). "
+                    "Avoid Devanagari script."
+                )
+
             with st.spinner("Compliance details check ki ja rahi hain (load zyada ho toh auto-retry hoga)..."):
                 prompt = f"""
                 You are an Indian GST and MSME Compliance Assistant for local vendors and small businesses.
@@ -69,9 +98,7 @@ if api_key:
                 Data: {final_data}
 
                 Language & Style Rules:
-                - Write the entire report in clean, natural Hinglish using Roman script (Latin alphabet), matching the app UI style.
-                - Keep standard GST, tax, and MSME technical terms in clear English (for example: GSTIN, HSN/SAC, CGST, SGST, IGST, Taxable Value, Invoice No, Invoice Date, Input Tax Credit, GSTR-1, GSTR-2B, Udyam, MSMED Act, Section 43B(h), E-way Bill).
-                - Avoid Devanagari script so the tone stays consistent throughout.
+                - {lang_instruction}
                 - Keep formatting crisp, structured, and easy to read on a mobile screen.
 
                 Structure the report into these 4 sections:
@@ -113,6 +140,13 @@ if api_key:
 
                 st.subheader("📊 Basic Audit Report")
                 st.markdown(report_text)
+
+                st.download_button(
+                    label="📥 Download Audit Report (.txt)",
+                    data=report_text,
+                    file_name="gst_msme_audit_report.txt",
+                    mime="text/plain"
+                )
 
                 st.divider()
                 st.info("💎 **Aage ke liye Pro Idea:** Bulk invoice check, detailed checklist export, aur vendor summary reports isme aage add kiye ja sakte hain.")
